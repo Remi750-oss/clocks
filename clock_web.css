@@ -1,0 +1,125 @@
+/* clock_web.css
+   Styles pour l'horloge analogique web-friendly
+*/
+:root{
+  --size: 420px;
+  --bg: linear-gradient(180deg,#f6f9fc,#e9eef6);
+  --rim: #2b2b2b;
+  --tick: #111;
+  --hour-hand: #222;
+  --minute-hand: #444;
+  --second-hand: #d00;
+}
+
+html,body{
+  height:100%;
+  margin:0;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  background: radial-gradient(circle at 20% 10%, #e6f0ff, transparent 20%), #f3f6fb;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.clock-wrap{
+  width:var(--size);
+  height:var(--size);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:20px;
+}
+
+.clock{
+  position:relative;
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  background: var(--bg);
+  box-shadow: 0 8px 20px rgba(20,40,80,0.12), inset 0 4px 12px rgba(255,255,255,0.6);
+  border: 8px solid var(--rim); /* thicker outer rim */
+}
+
+.tick{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform-origin: 50% calc(50% - var(--radius, 190px));
+}
+
+.tick .line{
+  position:absolute;
+  left:50%;
+  top:calc(50% - var(--radius,190px));
+  transform-origin:50% 100%;
+  background:var(--tick);
+}
+
+/* hands */
+.hand{
+  position:absolute;
+  left:50%;
+  top:50%;
+  /* pivot at the bottom center of the hand */
+  transform-origin:50% 100%;
+  /* we will translate so that the bottom of the hand is at the center */
+  transform: translate(-50%,-100%) rotate(0deg);
+  border-radius:6px;
+}
+
+.hand.hour{
+  width:8px;
+  height:45%;
+  background: var(--hour-hand);
+  z-index:4;
+}
+.hand.minute{
+  width:6px;
+  height:65%;
+  background: var(--minute-hand);
+  z-index:5;
+}
+.hand.second{
+  width:4px;
+  height:85%;
+  background: var(--second-hand);
+  z-index:6;
+  box-shadow: 0 0 8px rgba(208,0,0,0.4);
+}
+
+.center-dot{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:12px;
+  height:12px;
+  margin-left:-6px;
+  margin-top:-6px;
+  background:#222;
+  border-radius:50%;
+  z-index:8;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.number{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform-origin:50% 50%;
+  font-weight:600;
+  color:#0b1b2b;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+}
+
+/* responsive tweaks */
+@media (max-width:500px){
+  :root{--size:320px}
+}
+
+/* small caption */
+.caption{
+  text-align:center;
+  margin-top:12px;
+  color:#33475b;
+  font-size:14px;
+}

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Horloge analogique</title>
+  <link rel="stylesheet" href="clock_web.css">
+</head>
+<body>
+  <div class="clock-wrap" style="position: relative;">
+    <div class="clock" id="clock">
+      <div class="hand hour" id="hour"></div>
+      <div class="hand minute" id="minute"></div>
+      <div class="hand second" id="second"></div>
+      <div class="center-dot"></div>
+      <!-- numbers will be injected by JS -->
+    </div>
+  </div>
+  </div>
+  <div class="caption">Horloge analogique — essayez le mode responsive</div>
+<script>
+  const clock = document.getElementById('clock');
+  const r = Math.min(clock.clientWidth, clock.clientHeight)/2;
+  // create numbers
+  for(let n=1;n<=12;n++){
+    const el = document.createElement('div');
+    el.className='number';
+    el.textContent = n;
+    const angle = n*30*Math.PI/180;
+    const radius = r*0.72;
+    const x = 50 + (radius*Math.sin(angle))/r*50;
+    const y = 50 - (radius*Math.cos(angle))/r*50;
+    el.style.left = x+'%';
+    el.style.top = y+'%';
+    el.style.fontSize = (r*0.06)+'px';
+    el.style.transform = 'translate(-50%,-50%)';
+    clock.appendChild(el);
+  }
+  const hour = document.getElementById('hour');
+  const minute = document.getElementById('minute');
+  const second = document.getElementById('second');
+  function update(){
+    const rect = clock.getBoundingClientRect();
+    const cx = rect.width/2;
+    const cy = rect.height/2;
+    // set hand sizes based on radius
+    const rpx = Math.min(rect.width, rect.height)/2;
+    hour.style.height = Math.round(rpx*0.45)+'px';
+    minute.style.height = Math.round(rpx*0.65)+'px';
+    second.style.height = Math.round(rpx*0.85)+'px';
+
+    const now = new Date();
+    const h = now.getHours()%12;
+    const m = now.getMinutes();
+    const s = now.getSeconds();
+    const ms = now.getMilliseconds();
+    const hourAngle = (h + m/60)*30;
+    const minuteAngle = (m + s/60)*6;
+    const secondAngle = (s + ms/1000)*6;
+    // translate(-50%,-100%) puts bottom of hand at center, then rotate
+    hour.style.transform = `translate(-50%,-100%) rotate(${hourAngle}deg)`;
+    minute.style.transform = `translate(-50%,-100%) rotate(${minuteAngle}deg)`;
+    second.style.transform = `translate(-50%,-100%) rotate(${secondAngle}deg)`;
+  }
+  setInterval(update,50);
+  update();
+  // =====================================================================
+  // ajout d'un bouton pour dire l'heure à voix haute
+  // nécessite un navigateur moderne avec l'API SpeechSynthesis
+  // ou PowerShell (Windows) si pyttsx3 n'est pas installé
+
+  // === Speak-time button (coller ici, après la création de l'objet clock) ===
+  function speak_time() {
+    const now = new Date();
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    let text = '';
+    // texte en français
+    if (minute === 0) {
+      text = `Il est ${hour} heure`;
+    } else if (minute === 1) {
+      text = `Il est ${hour} heure et une minute`;
+    } else {
+      text = `Il est ${hour} heures ${minute} minutes`;
+    }
+
+    try {
+      // utilisation hors-ligne si pyttsx3 est installé
+      const engine = new window.SpeechSynthesisUtterance();
+      engine.text = text;
+      window.speechSynthesis.speak(engine);
+    } catch (e) {
+      // fallback : PowerShell System.Speech (Windows)
+      const safe_text = text.replace(/'/g, "’");
+      const ps = `Add-Type –AssemblyName System.speech; $s = New-Object System.Speech.Synthesis.SpeechSynthesizer; $s.Speak('${safe_text}');`;
+      const command = `powershell -Command "${ps}"`;
+      window.open('data:text/html;charset=utf-8,' + encodeURI(command));
+    }
+  }
+
+  // bouton à droite du cadran
+  const speakBtn = document.createElement('button');
+  speakBtn.textContent = 'Dire l\'heure';
+  speakBtn.onclick = speak_time;
+  speakBtn.style.position = 'absolute';
+  speakBtn.style.left = 'calc(50% + 250px)';
+  speakBtn.style.top = '50%';
+  speakBtn.style.transform = 'translateY(-50%)';
+  document.querySelector('.clock-wrap').appendChild(speakBtn);
+  // =====================================================================
+</script>
+</body>
+</html>
